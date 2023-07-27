@@ -12,7 +12,7 @@ public class CaesarCipherFile {
 
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Введіть шлях до фалу:");
+        System.out.println("Введіть шлях до фалйлу:");
         String fileInput = scanner.nextLine();
 
         System.out.println("Веведіть шлях для збереження нового файлу:");
@@ -24,7 +24,7 @@ public class CaesarCipherFile {
                 int shift = scanner.nextInt();
                 System.out.println("Введіть число 1 для зсуву вправо, число 2 для зсуву вліво:");
                 int way = scanner.nextInt();
-                System.out.println("Введіть число 1 щоб зашифрувати чило, число 2 щоб розшифрувати:");
+                System.out.println("Введіть число 1 щоб зашифрувати текст, число 2 щоб розшифрувати:");
                 int cipher = scanner.nextInt();
 
                 if (way == 1 && cipher == 1 || way == 1 && cipher == 2) {
