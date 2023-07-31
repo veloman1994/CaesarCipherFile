@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class CaesarCipherFile {
     public static   char[] upperAlphabet = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ.,”:-!? ".toCharArray();
     public static   char[] lowerAlphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя.,”:-!? ".toCharArray();
+    public static char[] textChar;
     public static void main(String[] args) {
 
 
@@ -18,27 +19,36 @@ public class CaesarCipherFile {
         System.out.println("Веведіть шлях для збереження нового файлу:");
         String fileOutput = scanner.nextLine();
         try {
-            char[] textChar = readTextFromFile(fileInput);
-            if (textChar != null) {
-                System.out.println("Введіть ціле число більше за 0 для зсуву:");
-                int shift = scanner.nextInt();
-                System.out.println("Введіть число 1 для зсуву вправо, число 2 для зсуву вліво:");
-                int way = scanner.nextInt();
-                System.out.println("Введіть число 1 щоб зашифрувати текст, число 2 щоб розшифрувати:");
-                int cipher = scanner.nextInt();
 
-                if (way == 1 && cipher == 1 || way == 1 && cipher == 2) {
-                    char[] encryptedChar = encrypt(textChar, shift);
-                    saveEncryptedTextToFile(fileOutput, encryptedChar);
-                } else if (way == 2 && cipher == 2 || way == 2 && cipher == 1) {
-                    char[] decryptedChar = decrypt(textChar, shift);
-                    saveEncryptedTextToFile(fileOutput, decryptedChar);
+              textChar =  readTextFromFile(fileInput);
+
+            if (textChar != null) {
+                System.out.println("Введіть ціле число більше за 0 для зсуву, або -1 якщо незнаєте ключ:");
+                int shift = scanner.nextInt();
+                if (shift >= 0) {
+                    System.out.println("Введіть число 1 для зсуву вправо, число 2 для зсуву вліво:");
+                    int way = scanner.nextInt();
+                    System.out.println("Введіть число 1 щоб зашифрувати текст, число 2 щоб розшифрувати:");
+                    int cipher = scanner.nextInt();
+
+                    if (way == 1 && cipher == 1 || way == 1 && cipher == 2) {
+                        char[] encryptedChar = encrypt(textChar, shift);
+                        saveTextToFile(fileOutput, encryptedChar);
+                    } else if (way == 2 && cipher == 2 || way == 2 && cipher == 1) {
+                        char[] decryptedChar = decrypt(textChar, shift);
+                        saveTextToFile(fileOutput, decryptedChar);
+                    }
+                } else if (shift == -1) {
+                    CaesarCipherBruteForce.setDoneChar(CaesarCipherBruteForce.bruteForceDecryptWithDictionary(textChar));
+                    char[] bruteForce = CaesarCipherBruteForce.getDoneChar();
+                    saveTextToFile(fileOutput, bruteForce);
                 }
             }
         } catch (IOException e) {
             System.out.println("Помилка введення/виведення: " + e.getMessage());
         }
     }
+
     public static char[] readTextFromFile(String fileInput) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(fileInput));
         return new String(bytes, StandardCharsets.UTF_8).toCharArray();
@@ -64,12 +74,12 @@ public class CaesarCipherFile {
         return encrypted;
     }
     public static char[] decrypt(char[] text, int step2) {
-         step2 = lowerAlphabet.length - step2;
+         step2 = lowerAlphabet.length - (step2 % lowerAlphabet.length);
         return encrypt(text, step2);
 
     }
 
-    private static int indexOf(char[] upperAlphabet, char c) {
+    public static int indexOf(char[] upperAlphabet, char c) {
         for (int i = 0; i < upperAlphabet.length; i++) {
             if (upperAlphabet[i] == Character.toUpperCase(c)) {
                 return i;
@@ -78,7 +88,7 @@ public class CaesarCipherFile {
        return -1;
     }
 
-    public static void saveEncryptedTextToFile(String filePath, char[] encryptedChars) throws IOException {
+    public static void saveTextToFile(String filePath, char[] encryptedChars) throws IOException {
        String encryptedText = new String(encryptedChars);
        Files.write(Paths.get(filePath), encryptedText.getBytes(StandardCharsets.UTF_8));
        System.out.println("Зашифрований текст був збережений у файл: " + filePath);
